@@ -1,10 +1,61 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+// const products = [
+//   { name: 'Cabbage', id: 1 },
+//   { name: 'Garlic', id: 2 },
+//   { name: 'Apple', id: 3 },
+// ];
+
+const products = [];
+
+
+// const listItems = products.map(product =>
+//   <li key={product.id}>
+//     {product.title}
+//   </li>
+// );
+
+function renderListItems(listItems) {
+  return listItems["myListItems"].map(listItem => {
+    return (
+      <li key={listItem.name}>
+        {listItem.sequence}
+      </li>
+    );
+  });
+}
+
+function MyListToShow(myListItems) {
+  console.log(myListItems)
+    return (
+      <>
+      <ul>{renderListItems(myListItems)}</ul>
+      </>
+    )
+}
+
+const getData = async () => {
+  // const resp = await fetch('http://127.0.0.1:8100/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');  # local dev
+  const resp = await fetch('http://seqcolapi.databio.org/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');
+  const json = await resp.json();
+  // return products
+  return json
+}
+
 function App() {
   const [count, setCount] = useState(0)
+  const [myListItems, setMyListItems] = useState(products)
+
+  function handleClick() {
+    getData().then((data) => {
+      setMyListItems(data);
+      console.log(data);
+      console.log(myListItems)
+    });
+  }
 
   return (
     <>
@@ -25,6 +76,10 @@ function App() {
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
       </div>
+      <ul><MyListToShow myListItems={myListItems} /></ul>
+      <button onClick={handleClick}>
+        Load data
+      </button>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
