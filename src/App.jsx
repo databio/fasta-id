@@ -39,7 +39,7 @@ function MyListToShow(myListItems) {
 
 const getData = async () => {
   // const resp = await fetch('http://127.0.0.1:8100/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');  # local dev
-  const resp = await fetch('http://seqcolapi.databio.org/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');
+  const resp = await fetch('https://seqcolapi.databio.org/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');
   const json = await resp.json();
   // return products
   return json
