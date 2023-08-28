@@ -3,6 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+import forge from 'node-forge';
+
 // const products = [
 //   { name: 'Cabbage', id: 1 },
 //   { name: 'Garlic', id: 2 },
@@ -11,6 +13,16 @@ import './App.css'
 
 const products = [];
 
+function trunc512_digest(seq, offset=24) {
+  var md = forge.md.sha512.create();
+  md.update(seq)
+  var bytes = md.digest().getBytes();
+  bytes = bytes.slice(0, offset);
+  bytes = forge.util.bytesToHex(bytes);
+  return bytes
+}
+
+console.log(trunc512_digest("TCGA"))
 
 // const listItems = products.map(product =>
 //   <li key={product.id}>
@@ -56,6 +68,8 @@ function App() {
       console.log(myListItems)
     });
   }
+
+
 
   return (
     <>
