@@ -13,6 +13,8 @@ import React from 'react';
 //   { name: 'Apple', id: 3 },
 // ];
 
+// HEY! don't use var! use let!
+
 var options = {
   'definition': 'id',
   'delimiter': '>'
@@ -75,12 +77,19 @@ console.log(fp.parse(sequenceData));
 //   </li>
 // );
 
-function renderListItems(listItems) {
-  return listItems["myListItems"].map(listItem => {
+function renderListItems(params) {
+  console.log("Rendering list items...", params["myListItems"])
+  if (params["myListItems"]["sequences"] == undefined) {
+    return <li>no sequences</li>
+  }
+  console.log("Found sequences...")
+  return params["myListItems"]["sequences"].map(listItem => {
     return (
-      <li key={listItem.name}>
-        {listItem.sequence}
-      </li>
+      <tr>
+        <td key={listItem.name}>{listItem.name}</td>
+        <td>{listItem.length}</td>
+        <td>{listItem.sequence}</td>
+      </tr>
     );
   });
 }
@@ -89,10 +98,38 @@ function MyListToShow(myListItems) {
   console.log(myListItems)
     return (
       <>
-      <ul>{renderListItems(myListItems)}</ul>
+      <table>
+        <tr>
+          <th>Sequence name</th>
+          <th>Length</th>
+          <th>Sequence digest</th>
+        </tr>
+      {renderListItems(myListItems)}
+      </table>
       </>
     )
 }
+
+class SequenceCollection {
+  constructor(digest) {
+    console.log(`Creating sequence collection... {digest}`)
+    this.digest = digest;
+  }
+
+
+  getCollection() {
+    fetch (server.api + "collection/" + this.digest)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        return data;
+      })  
+  }
+}
+
+const sequenceCollection = new SequenceCollection("asdf");
+
+
 
 function MyTextbox() {
   return (
@@ -102,13 +139,19 @@ function MyTextbox() {
   )
 }
 
+let server = {
+  api: "https://seqcolapi.databio.org/",
+}
+
 const getData = async () => {
-  // const resp = await fetch('http://127.0.0.1:8100/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');  # local dev
-  const resp = await fetch('https://seqcolapi.databio.org/collection/59319772d1bcf2e0dd4b8a296f2d9682?format=collated');
+  // const resp = await fetch('http://127.0.0.1:8100/collection/59319772d1bcf2e0dd4b8a296f2d9682?collated=false');  # local dev
+  const resp = await fetch('https://seqcolapi.databio.org/collection/MFxJDHkVdTBlPvUFRbYWDZYxmycvHSRp?collated=false');
   const json = await resp.json();
   // return products
   return json
 }
+
+
 
 class FileInput extends React.Component {
   constructor(props) {
@@ -156,9 +199,56 @@ function parseFasta() {
   result.innerHTML = seqcol_digest(parsed);
 }
 
+let userName = "Nathan Sheffield"
+
+let count = 0;
+
+const addOne = () => {
+  console.log("Adding one...", count)
+  count++;
+}
+
+const minusOne = () => {
+  console.log("Minus one...")
+  count--;  
+}
+
+const resetCount = () => {
+  console.log("resetting")
+  count = 0;
+}
+
+let visibility = true;
+
+
+
+function VisibilityToggle() {
+  const [visibility, setVisibility] = useState(true)
+
+  const toggleVisibility = () => {
+    console.log("toggle")
+    setVisibility(!visibility)
+  }
+  return (<div> asdf
+  <button onClick={toggleVisibility}>{visibility ? "Show details" : "Hide details"}</button>
+  { visibility && <p id="memo">details here</p> }
+  </div>)
+  };
+
+
+
+const templateTwo = (
+  <div>
+    <h2>Count: {count}</h2>
+    <button onClick={addOne}>+1</button>
+    <button onClick={resetCount}>Reset one</button>
+    <button onClick={minusOne}>-1</button>
+  </div>
+);
+
 function App() {
   const [count, setCount] = useState(0)
-  const [myListItems, setMyListItems] = useState(products)
+  const [myListItems, setMyListItems] = useState([])
 
   function handleClick() {
     getData().then((data) => {
@@ -170,10 +260,11 @@ function App() {
 
   return (
     <>
-      <ul><MyListToShow myListItems={myListItems} /></ul>
+    <VisibilityToggle/>
       <button onClick={handleClick}>
         Load data
       </button>
+      <ul><MyListToShow myListItems={myListItems} /></ul>
     <br />
       <MyTextbox />
       <br />
